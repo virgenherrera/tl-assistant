@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { basename, join, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { AppModule } from '#app/app.module';
-import { AppConfigService } from '#config/services/app-config/app-config.service';
+import { AppConfigModule, FoundationDocsConfig } from '#config';
 import { RefreshDogmaService } from '#dogma-context/services';
 import { DOGMA_OUTPUT_DIR } from '#dogma-context/providers';
 import type { DogmaRefreshEvent } from '#dogma-context/domain';
@@ -56,13 +56,13 @@ describe('Dogma refresh e2e integration', () => {
         .overrideProvider(DOGMA_OUTPUT_DIR)
         .useValue(outputDir)
         .compile();
-      const appConfig = moduleRef.get(AppConfigService);
+      const foundationDocsConfig = moduleRef.get<FoundationDocsConfig>(AppConfigModule.getToken(FoundationDocsConfig));
       const refreshDogma = moduleRef.get(RefreshDogmaService);
       const events: DogmaRefreshEvent[] = [];
 
       // Act
       const result = await refreshDogma.execute({
-        rootPaths: [appConfig.value.foundationDocs.discoveryRootPath],
+        rootPaths: [foundationDocsConfig.discoveryRootPath],
         concurrency: 2,
         onProgress: (event) => events.push(event),
       });
@@ -74,7 +74,7 @@ describe('Dogma refresh e2e integration', () => {
       const briefMarkdown = await readFile(join(outputDir, 'dogma-brief.md'), 'utf8');
       const agentContext = await readFile(join(outputDir, 'AGENT_CONTEXT.md'), 'utf8');
 
-      expect(appConfig.value.foundationDocs.discoveryRootPath).toBe(discoveryRoot);
+      expect(foundationDocsConfig.discoveryRootPath).toBe(discoveryRoot);
       expect(outputFileNames).toEqual([
         'source-map.json',
         'extractions.json',

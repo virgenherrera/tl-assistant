@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Command, CommandRunner, Option } from 'nest-commander';
-import { AppConfigService } from '#config/services/app-config/app-config.service';
+import { FoundationDocsConfig, InjectConfig, toAbsoluteLocalPath } from '#config';
 import { DOGMA_OUTPUT_DIR } from '#dogma-context/providers';
 import type { DogmaRefreshEvent } from '#dogma-context/domain';
 import { RefreshDogmaService } from '#dogma-context/services';
@@ -17,7 +17,7 @@ interface DogmaRefreshOptions {
 })
 export class DogmaRefreshCommand extends CommandRunner {
   constructor(
-    @Inject(AppConfigService) private readonly appConfig: AppConfigService,
+    @InjectConfig(FoundationDocsConfig) private readonly foundationDocsConfig: FoundationDocsConfig,
     @Inject(RefreshDogmaService) private readonly refreshDogma: RefreshDogmaService,
     @Inject(DOGMA_OUTPUT_DIR) private readonly defaultOutputDir: string,
   ) {
@@ -25,10 +25,9 @@ export class DogmaRefreshCommand extends CommandRunner {
   }
 
   async run(_passedParams: string[], options: DogmaRefreshOptions): Promise<void> {
-    const config = this.appConfig.value;
-    const outputDir = this.appConfig.toAbsoluteLocalPath(options.outputDir ?? this.defaultOutputDir);
+    const outputDir = toAbsoluteLocalPath(options.outputDir ?? this.defaultOutputDir);
     const result = await this.refreshDogma.execute({
-      rootPaths: [config.foundationDocs.discoveryRootPath],
+      rootPaths: [this.foundationDocsConfig.discoveryRootPath],
       outputDir,
       ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
       ...(options.progress === true ? { onProgress: (event) => printProgressEvent(event) } : {}),

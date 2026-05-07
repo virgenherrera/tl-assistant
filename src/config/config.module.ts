@@ -1,8 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AppConfigService } from './services/app-config/app-config.service';
+import { AppConfigModule } from './app-config.module';
+import { DogmaOutputConfig, FoundationDocsConfig } from './configurations';
 
 @Module({
-  providers: [AppConfigService],
-  exports: [AppConfigService],
+  imports: [
+    AppConfigModule.forRoot({
+      cache: false,
+      configClasses: [FoundationDocsConfig, DogmaOutputConfig],
+      expandVariables: true,
+      isGlobal: true,
+    }),
+  ],
+  exports: [AppConfigModule],
 })
 export class ConfigModule {}
