@@ -1,0 +1,6 @@
+allowBuilds:
+  esbuild: false
+  '@nestjs/core': false
+ignoredBuiltDependencies:
+  - esbuild
+  - '@nestjs/core'

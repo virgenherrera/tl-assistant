@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.secret.*
+*.local.*
+
+# local/private assistant data
+.tl-assistant/
+.local-data/
+.cache/
+foundation-docs/
+docs/foundation/
+docs/knowledge-map/private/
+docs/knowledge-map/raw/
+docs/knowledge-map/snapshots/
+
+# Playwright/RPA sensitive artifacts
+playwright/.auth/
+storage-state.json
+*.har
+*.trace.zip
+traces/
+test-results/
+playwright-report/
+
+# logs
+*.log
+logs/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# coverage reports
+coverage/

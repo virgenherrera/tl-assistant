@@ -1,0 +1,57 @@
+{
+  "name": "tl-assistant",
+  "version": "0.1.0",
+  "description": "Local-first TL assistant with agent-mediated reading, Jira integration, and foundation dogma refresh.",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@11.0.6",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "bin": {
+    "tl-assistant": "./src/main.ts"
+  },
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dogma:refresh": "tsx src/main.ts dogma:refresh",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.19",
+    "@nestjs/core": "^11.1.19",
+    "dotenv": "^17.4.2",
+    "fast-glob": "^3.3.3",
+    "mammoth": "^1.12.0",
+    "nest-commander": "^3.20.1",
+    "pdf-parse": "^2.4.5",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "xlsx": "^0.18.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.21",
+    "@nestjs/schematics": "^11.1.0",
+    "@nestjs/testing": "^11.1.19",
+    "@types/node": "^22.19.17",
+    "@types/pdf-parse": "^1.1.5",
+    "@vitest/coverage-v8": "^4.1.5",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  },
+  "imports": {
+    "#app/*": "./src/*",
+    "#config/*": "./src/config/*",
+    "#dogma-context": "./src/dogma-context/index.ts",
+    "#dogma-context/*": "./src/dogma-context/*",
+    "#domain/*": "./src/domain/*",
+    "#ports": "./src/ports/index.ts",
+    "#ports/*": "./src/ports/*",
+    "#shared/*": "./src/shared/*"
+  }
+}
