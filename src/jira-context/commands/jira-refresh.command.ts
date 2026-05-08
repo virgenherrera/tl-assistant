@@ -1,3 +1,4 @@
+import { Inject } from '@nestjs/common';
 import { Option, Command, CommandRunner } from 'nest-commander';
 import { toAbsoluteLocalPath } from '#config';
 import { JiraRefreshService } from '#jira-context/services';
@@ -11,7 +12,7 @@ interface JiraRefreshOptions {
   description: 'Genera contexto local read-only de Jira para agentes TL.',
 })
 export class JiraRefreshCommand extends CommandRunner {
-  constructor(private readonly refreshService: JiraRefreshService) {
+  constructor(@Inject(JiraRefreshService) private readonly refreshService: JiraRefreshService) {
     super();
   }
 

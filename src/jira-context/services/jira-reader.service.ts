@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JiraConfig, InjectConfig } from '#config';
 import { JiraHttpClientService } from '#jira-context/adapters';
 import type { JiraBoardBrief, JiraIssueBrief, JiraSprintBrief } from '#jira-context/domain';
@@ -7,7 +7,7 @@ import type { JiraBoardBrief, JiraIssueBrief, JiraSprintBrief } from '#jira-cont
 export class JiraReaderService {
   constructor(
     @InjectConfig(JiraConfig) private readonly config: JiraConfig,
-    private readonly httpClient: JiraHttpClientService,
+    @Inject(JiraHttpClientService) private readonly httpClient: JiraHttpClientService,
   ) {}
 
   async getBoard(): Promise<JiraBoardBrief> {

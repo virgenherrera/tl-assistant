@@ -11,12 +11,12 @@ import { JiraReaderService } from './jira-reader.service';
 @Injectable()
 export class JiraRefreshService {
   constructor(
-    private readonly doctor: JiraDoctorService,
-    private readonly reader: JiraReaderService,
-    private readonly dependencyMapper: JiraDependencyMapperService,
-    private readonly brief: JiraBriefService,
-    private readonly repository: LocalJiraContextRepositoryService,
-    private readonly capabilityRegistry: AgentCapabilityRegistry,
+    @Inject(JiraDoctorService) private readonly doctor: JiraDoctorService,
+    @Inject(JiraReaderService) private readonly reader: JiraReaderService,
+    @Inject(JiraDependencyMapperService) private readonly dependencyMapper: JiraDependencyMapperService,
+    @Inject(JiraBriefService) private readonly brief: JiraBriefService,
+    @Inject(LocalJiraContextRepositoryService) private readonly repository: LocalJiraContextRepositoryService,
+    @Inject(AgentCapabilityRegistry) private readonly capabilityRegistry: AgentCapabilityRegistry,
     @Inject(JIRA_OUTPUT_DIR) private readonly defaultOutputDir: string,
   ) {}
 

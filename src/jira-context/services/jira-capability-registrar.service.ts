@@ -1,9 +1,9 @@
-import { Injectable, type OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
 import { AgentCapabilityRegistry } from '#capabilities';
 
 @Injectable()
 export class JiraCapabilityRegistrarService implements OnModuleInit {
-  constructor(private readonly capabilityRegistry: AgentCapabilityRegistry) {}
+  constructor(@Inject(AgentCapabilityRegistry) private readonly capabilityRegistry: AgentCapabilityRegistry) {}
 
   onModuleInit(): void {
     this.capabilityRegistry.register({

@@ -1,3 +1,4 @@
+import { Inject } from '@nestjs/common';
 import { Command, CommandRunner } from 'nest-commander';
 import { JiraDoctorService } from '#jira-context/services';
 
@@ -6,7 +7,7 @@ import { JiraDoctorService } from '#jira-context/services';
   description: 'Valida conexión read-only contra Jira y visibilidad del board configurado.',
 })
 export class JiraDoctorCommand extends CommandRunner {
-  constructor(private readonly doctor: JiraDoctorService) {
+  constructor(@Inject(JiraDoctorService) private readonly doctor: JiraDoctorService) {
     super();
   }
 

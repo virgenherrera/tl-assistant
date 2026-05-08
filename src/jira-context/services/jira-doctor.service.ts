@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JiraConfig, InjectConfig } from '#config';
 import { AgentCapabilityRegistry } from '#capabilities';
 import type { JiraConnectionSnapshot } from '#jira-context/domain';
@@ -9,8 +9,8 @@ import { JiraReaderService } from './jira-reader.service';
 export class JiraDoctorService {
   constructor(
     @InjectConfig(JiraConfig) private readonly config: JiraConfig,
-    private readonly reader: JiraReaderService,
-    private readonly capabilityRegistry: AgentCapabilityRegistry,
+    @Inject(JiraReaderService) private readonly reader: JiraReaderService,
+    @Inject(AgentCapabilityRegistry) private readonly capabilityRegistry: AgentCapabilityRegistry,
   ) {}
 
   async handshake(): Promise<JiraConnectionSnapshot> {
