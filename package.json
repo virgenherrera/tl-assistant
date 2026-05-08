@@ -20,7 +20,8 @@
     "foundation:refresh": "tsx src/main.ts foundation:refresh",
     "coverage": "vitest run --coverage",
     "jira:doctor": "tsx src/main.ts jira:doctor",
-    "jira:refresh": "tsx src/main.ts jira:refresh"
+    "jira:refresh": "tsx src/main.ts jira:refresh",
+    "tl:bootstrap": "tsx src/main.ts tl:bootstrap"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",
@@ -60,6 +61,8 @@
     "#capabilities": "./src/capabilities/index.ts",
     "#capabilities/*": "./src/capabilities/*",
     "#jira-context": "./src/jira-context/index.ts",
-    "#jira-context/*": "./src/jira-context/*"
+    "#jira-context/*": "./src/jira-context/*",
+    "#tl-bootstrap": "./src/tl-bootstrap/index.ts",
+    "#tl-bootstrap/*": "./src/tl-bootstrap/*"
   }
 }

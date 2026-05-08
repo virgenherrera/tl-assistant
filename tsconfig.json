@@ -65,6 +65,12 @@
       ],
       "#jira-context/*": [
         "./src/jira-context/*"
+      ],
+      "#tl-bootstrap": [
+        "./src/tl-bootstrap/index.ts"
+      ],
+      "#tl-bootstrap/*": [
+        "./src/tl-bootstrap/*"
       ]
     }
   },

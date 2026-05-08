@@ -37,6 +37,26 @@ pnpm dev -- jira:refresh
 - Usar refs `jira://board/{id}`, `jira://sprint/{id}` y `jira://issue/{key}`; no pegar dumps crudos de Jira.
 - Fase actual Jira es read-only: nunca borrar, transicionar ni escribir comentarios desde esta capability.
 
+## Bootstrap operativo para agentes
+
+- Después de correr `jira:refresh` y/o `foundation:refresh`, generar el runbook operativo con:
+
+```bash
+pnpm tl:bootstrap
+```
+
+- Para cualquier agente externo, la primera instrucción debe ser:
+
+```txt
+Lee .tl-assistant/agent/OPERATING_CONTEXT.md y ejecuta el prompt operativo que corresponda. Si no puedes leer los artifacts requeridos, dilo explícitamente y no inventes.
+```
+
+- Prompts disponibles:
+  - `.tl-assistant/agent/prompts/sprint-status.md`
+  - `.tl-assistant/agent/prompts/planning-refinement.md`
+  - `.tl-assistant/agent/prompts/daily-brief.md`
+  - `.tl-assistant/agent/prompts/risk-review.md`
+
 ## Invariantes del agente
 
 - Hablar siempre español con el usuario salvo instrucción explícita de otro idioma.

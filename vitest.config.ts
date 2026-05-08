@@ -14,6 +14,8 @@ export default defineConfig({
         'src/foundation-context/commands/**',
         // Nest Commander adapter: Jira command side effects are covered through services/e2e boundaries.
         'src/jira-context/commands/**',
+        // Nest Commander adapter: TL bootstrap command is covered through service/e2e boundaries.
+        'src/tl-bootstrap/commands/**',
       ],
     },
   },
