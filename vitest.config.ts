@@ -12,6 +12,8 @@ export default defineConfig({
         '.tl-assistant/**',
         // Nest Commander adapter: validated by smoke/CLI usage, not the e2e domain flow.
         'src/dogma-context/commands/**',
+        // Nest Commander adapter: Jira command side effects are covered through services/e2e boundaries.
+        'src/jira-context/commands/**',
       ],
     },
   },

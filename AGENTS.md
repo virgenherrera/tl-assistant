@@ -15,6 +15,28 @@ FOUNDATION_DOCS_PATH="/ruta/local/a/foundation-docs" pnpm dogma:refresh
   - `.tl-assistant/dogma/dogma-brief.md`
   - `.tl-assistant/dogma/source-map.json`
 
+## Contexto Jira read-only
+
+- Si Jira está configurado, validar conexión y permisos con:
+
+```bash
+pnpm dev -- jira:doctor
+```
+
+- Regenerar snapshot TL local con:
+
+```bash
+pnpm dev -- jira:refresh
+```
+
+- Los artifacts locales se generan en `.tl-assistant/jira/` y NO se commitean.
+- Para contexto Jira, leé primero:
+  - `.tl-assistant/jira/AGENT_JIRA_CONTEXT.md`
+  - `.tl-assistant/jira/tl-brief.md`
+  - `.tl-assistant/jira/dependency-map.json`
+- Usar refs `jira://board/{id}`, `jira://sprint/{id}` y `jira://issue/{key}`; no pegar dumps crudos de Jira.
+- Fase actual Jira es read-only: nunca borrar, transicionar ni escribir comentarios desde esta capability.
+
 ## Invariantes del agente
 
 - Hablar siempre español con el usuario salvo instrucción explícita de otro idioma.

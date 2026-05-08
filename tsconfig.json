@@ -53,6 +53,18 @@
       ],
       "#config": [
         "./src/config/index.ts"
+      ],
+      "#capabilities": [
+        "./src/capabilities/index.ts"
+      ],
+      "#capabilities/*": [
+        "./src/capabilities/*"
+      ],
+      "#jira-context": [
+        "./src/jira-context/index.ts"
+      ],
+      "#jira-context/*": [
+        "./src/jira-context/*"
       ]
     }
   },

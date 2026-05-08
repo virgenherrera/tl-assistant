@@ -18,7 +18,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dogma:refresh": "tsx src/main.ts dogma:refresh",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "jira:doctor": "tsx src/main.ts jira:doctor",
+    "jira:refresh": "tsx src/main.ts jira:refresh"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",
@@ -54,6 +56,10 @@
     "#ports": "./src/ports/index.ts",
     "#ports/*": "./src/ports/*",
     "#shared/*": "./src/shared/*",
-    "#config": "./src/config/index.ts"
+    "#config": "./src/config/index.ts",
+    "#capabilities": "./src/capabilities/index.ts",
+    "#capabilities/*": "./src/capabilities/*",
+    "#jira-context": "./src/jira-context/index.ts",
+    "#jira-context/*": "./src/jira-context/*"
   }
 }
