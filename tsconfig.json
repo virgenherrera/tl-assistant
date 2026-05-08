@@ -33,11 +33,11 @@
       "#config/*": [
         "./src/config/*"
       ],
-      "#dogma-context": [
-        "./src/dogma-context/index.ts"
+      "#foundation-context": [
+        "./src/foundation-context/index.ts"
       ],
-      "#dogma-context/*": [
-        "./src/dogma-context/*"
+      "#foundation-context/*": [
+        "./src/foundation-context/*"
       ],
       "#domain/*": [
         "./src/domain/*"

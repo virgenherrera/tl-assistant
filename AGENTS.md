@@ -2,18 +2,18 @@
 
 ## Cómo usar este CLI
 
-- Configurar `FOUNDATION_DOCS_PATH` apuntando al directorio o archivo local de foundation docs.
+- `FOUNDATION_DOCS_PATH` configura la source local de foundation; `foundation:refresh` falla si no hay source disponible.
 - Regenerar contexto local con:
 
 ```bash
-FOUNDATION_DOCS_PATH="/ruta/local/a/foundation-docs" pnpm dogma:refresh
+FOUNDATION_DOCS_PATH="/ruta/local/a/foundation-docs" pnpm foundation:refresh
 ```
 
-- Los artifacts locales se generan en `.tl-assistant/dogma/` y NO se commitean.
+- Los artifacts locales se generan en `.tl-assistant/foundation/` y NO se commitean.
 - Para contextualizarte, leé primero:
-  - `.tl-assistant/dogma/AGENT_CONTEXT.md`
-  - `.tl-assistant/dogma/dogma-brief.md`
-  - `.tl-assistant/dogma/source-map.json`
+  - `.tl-assistant/foundation/AGENT_FOUNDATION_CONTEXT.md`
+  - `.tl-assistant/foundation/foundation-brief.md`
+  - `.tl-assistant/foundation/source-map.json`
 
 ## Contexto Jira read-only
 
@@ -41,10 +41,10 @@ pnpm dev -- jira:refresh
 
 - Hablar siempre español con el usuario salvo instrucción explícita de otro idioma.
 - Mantener personalidad Senku TL Assistant: precisión científica, criterio SSR/TL, pragmatismo y explicación clara.
-- Operar local-first: foundation docs, Jira, dogma y artifacts son sensibles por defecto.
+- Operar local-first: foundation docs, Jira y artifacts locales son sensibles por defecto.
 - Nunca tocar, mover, renombrar, borrar ni modificar `FOUNDATION_DOCS_PATH`; sólo leer/crawlear.
 - Nunca exponer contenido crudo ni full paths locales en outputs externos.
-- Citar fuentes con refs `foundation://ruta/relativa.ext`.
+- Citar fuentes con refs `foundation://local/ruta/relativa.ext`.
 - Si el brief no alcanza, usar `source-map.json` y `extractions.json` sólo dentro del entorno local confiable.
 
 ## Qué no cambia aunque cambie el contexto

@@ -4,6 +4,7 @@ export const appErrorCodes = {
   localPathNotReadable: 'LOCAL_PATH_NOT_READABLE',
   localPathInvalidKind: 'LOCAL_PATH_INVALID_KIND',
   agentRuntimeFailed: 'AGENT_RUNTIME_FAILED',
+  foundationSourceNotConfigured: 'FOUNDATION_SOURCE_NOT_CONFIGURED',
   jiraNotConfigured: 'JIRA_NOT_CONFIGURED',
   jiraAuthFailed: 'JIRA_AUTH_FAILED',
   jiraForbidden: 'JIRA_FORBIDDEN',

@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { mkdtemp, mkdir, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -23,7 +23,6 @@ describe('Jira context e2e integration', () => {
   it('starts without Jira capability when Jira env is absent', async () => {
     // Arrange
     clearJiraEnv();
-    process.env[foundationEnvKey] = await createReadableFoundationRoot();
 
     // Act
     const moduleRef = await Test.createTestingModule({ imports: [ConfigModule, CapabilityModule, JiraContextModule.registerIfConfigured()] }).compile();
@@ -37,7 +36,6 @@ describe('Jira context e2e integration', () => {
   it('fails with a typed error when Jira env is partial', async () => {
     // Arrange
     clearJiraEnv();
-    process.env[foundationEnvKey] = await createReadableFoundationRoot();
     process.env['JIRA_SITE_URL'] = 'https://example.atlassian.net';
 
     // Act
@@ -164,7 +162,7 @@ describe('Jira context e2e integration', () => {
 
 async function arrangeCompleteEnv(): Promise<void> {
   clearJiraEnv();
-  process.env[foundationEnvKey] = await createReadableFoundationRoot();
+  delete process.env[foundationEnvKey];
   process.env['JIRA_SITE_URL'] = 'https://example.atlassian.net';
   process.env['JIRA_EMAIL'] = 'tl@example.com';
   process.env['JIRA_API_TOKEN'] = 'secret-token';
@@ -175,11 +173,6 @@ function clearJiraEnv(): void {
   for (const key of jiraEnvKeys) delete process.env[key];
 }
 
-async function createReadableFoundationRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), 'tl-assistant-foundation-'));
-  await mkdir(root, { recursive: true });
-  return root;
-}
 
 function createJiraFetchMock(options: { readonly firstResponseStatus?: number; readonly alwaysResponseStatus?: number } = {}): JiraFetch {
   let calls = 0;

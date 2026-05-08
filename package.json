@@ -1,7 +1,7 @@
 {
   "name": "tl-assistant",
   "version": "0.1.0",
-  "description": "Local-first TL assistant with agent-mediated reading, Jira integration, and foundation dogma refresh.",
+  "description": "Local-first TL assistant with foundation context, Jira integration, and agent-mediated project discovery.",
   "type": "module",
   "private": true,
   "packageManager": "pnpm@11.0.6",
@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dogma:refresh": "tsx src/main.ts dogma:refresh",
+    "foundation:refresh": "tsx src/main.ts foundation:refresh",
     "coverage": "vitest run --coverage",
     "jira:doctor": "tsx src/main.ts jira:doctor",
     "jira:refresh": "tsx src/main.ts jira:refresh"
@@ -50,8 +50,8 @@
   "imports": {
     "#app/*": "./src/*",
     "#config/*": "./src/config/*",
-    "#dogma-context": "./src/dogma-context/index.ts",
-    "#dogma-context/*": "./src/dogma-context/*",
+    "#foundation-context": "./src/foundation-context/index.ts",
+    "#foundation-context/*": "./src/foundation-context/*",
     "#domain/*": "./src/domain/*",
     "#ports": "./src/ports/index.ts",
     "#ports/*": "./src/ports/*",

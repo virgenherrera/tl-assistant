@@ -1,4 +1,4 @@
-import type { DogmaBriefItem } from '#domain/dogma';
+import type { FoundationBriefItem } from '#domain/foundation';
 
 export interface AgentReadRequest {
   readonly sourceRef: string;
@@ -7,11 +7,11 @@ export interface AgentReadRequest {
 }
 
 export interface AgentReadResult {
-  readonly items: readonly DogmaBriefItem[];
+  readonly items: readonly FoundationBriefItem[];
   readonly summary: string;
 }
 
 export interface AgentRuntimePort {
   readonly name: string;
-  readForDogma(request: AgentReadRequest): Promise<AgentReadResult>;
+  readForFoundation(request: AgentReadRequest): Promise<AgentReadResult>;
 }

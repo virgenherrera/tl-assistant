@@ -2,16 +2,25 @@ import { z } from 'zod';
 import { parseReadableLocalPath } from '#config/path/local-paths';
 
 export class FoundationDocsConfig {
-  readonly discoveryRootPath!: string;
+  readonly configured!: boolean;
+  readonly discoveryRootPath?: string;
 
   static readonly schema = z
     .object({
       FOUNDATION_DOCS_PATH: z
-        .string({ error: 'FOUNDATION_DOCS_PATH is required.' })
+        .string()
         .trim()
-        .min(1, 'FOUNDATION_DOCS_PATH cannot be empty.'),
+        .min(1, 'FOUNDATION_DOCS_PATH cannot be empty.')
+        .optional(),
     })
-    .transform(({ FOUNDATION_DOCS_PATH }) => ({
-      discoveryRootPath: parseReadableLocalPath(FOUNDATION_DOCS_PATH, 'FOUNDATION_DOCS_PATH'),
-    } satisfies FoundationDocsConfig));
+    .transform(({ FOUNDATION_DOCS_PATH }) => {
+      if (FOUNDATION_DOCS_PATH === undefined) {
+        return { configured: false } satisfies FoundationDocsConfig;
+      }
+
+      return {
+        configured: true,
+        discoveryRootPath: parseReadableLocalPath(FOUNDATION_DOCS_PATH, 'FOUNDATION_DOCS_PATH'),
+      } satisfies FoundationDocsConfig;
+    });
 }
