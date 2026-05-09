@@ -193,6 +193,9 @@ describe('Jira context e2e integration', () => {
     expect(evidence).toContain('search-membership-api-contract.md');
     expect(refinementMarkdown).toContain('Pegá esto en la DESCRIPCIÓN');
     expect(refinementMarkdown).toContain('Qué ya NO hay que preguntar');
+    expect(agentPrompt).toContain('FridaPlatform.fridagpt');
+    expect(agentPrompt).toContain('No asumas MCP');
+    expect(agentPrompt).toContain('Trabajá file-first');
     expect(agentPrompt).toContain('No conviertas esto en implementación del CLI');
     expect(agentPrompt).toContain('Cada evidencia nueva elimina preguntas genéricas ya respondidas');
     expect(copiedSource).toContain('GET /api/members/search');

@@ -46,6 +46,8 @@ describe('TL bootstrap e2e integration', () => {
       expect(planningPrompt).toContain('Detecta issues que no están listos para planning/refinement');
       expect(planningPrompt).toContain('jira://');
       expect(storyRefinementPrompt).toContain('Transformar un issue Jira subdefinido');
+      expect(storyRefinementPrompt).toContain('FridaPlatform.fridagpt');
+      expect(storyRefinementPrompt).toContain('Trabajá file-first');
       expect(storyRefinementPrompt).toContain('Qué ya NO hay que preguntar');
       expect(storyRefinementPrompt).toContain('Pegá esto en la DESCRIPCIÓN');
       expect(storyRefinementPrompt).toContain('Cada nueva evidencia debe eliminar preguntas genéricas ya respondidas');
