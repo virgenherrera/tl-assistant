@@ -1,13 +1,13 @@
 import { Test } from '@nestjs/testing';
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { CapabilityModule, AgentCapabilityRegistry } from '#capabilities';
 import { ConfigModule } from '#config/config.module';
 import { JiraContextModule } from '#jira-context';
-import { JiraDoctorService, JiraRefreshService } from '#jira-context/services';
-import { JIRA_FETCH, JIRA_OUTPUT_DIR, type JiraFetch } from '#jira-context/providers';
+import { JiraDoctorService, JiraRefinementService, JiraRefreshService } from '#jira-context/services';
+import { JIRA_FETCH, JIRA_OUTPUT_DIR, JIRA_REFINEMENT_OUTPUT_DIR, type JiraFetch } from '#jira-context/providers';
 import { ConfigurationError, appErrorCodes } from '#shared/errors';
 import { jiraErrorCodes } from '#jira-context/domain';
 
@@ -158,6 +158,45 @@ describe('Jira context e2e integration', () => {
     expect(issuesMap).toContain('jira://issue/TL-1');
     expect(dependencyMap).toContain('jira://issue/TL-2');
   });
+
+  it('generates Jira refinement workspace with linked issues and local sources', async () => {
+    // Arrange
+    await arrangeCompleteEnv();
+    const tempDir = await mkdtemp(join(tmpdir(), 'tl-assistant-jira-refine-e2e-'));
+    const outputDir = join(tempDir, '.tl-assistant', 'refinement');
+    const sourceDir = join(tempDir, 'sources');
+    const sourcePath = join(sourceDir, 'search-membership-api-contract.md');
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(sourcePath, '# API Contract\n\nGET /api/members/search\n', 'utf8');
+    const moduleRef = await Test.createTestingModule({ imports: [ConfigModule, CapabilityModule, JiraContextModule.registerIfConfigured()] })
+      .overrideProvider(JIRA_FETCH)
+      .useValue(createJiraFetchMock())
+      .overrideProvider(JIRA_REFINEMENT_OUTPUT_DIR)
+      .useValue(outputDir)
+      .compile();
+    await moduleRef.init();
+    const refinement = moduleRef.get(JiraRefinementService);
+
+    // Act
+    const result = await refinement.refine({ issueKey: 'TL-1', sourcePaths: [sourcePath] });
+
+    // Assert
+    const evidence = await readFile(join(outputDir, 'TL-1', 'evidence.json'), 'utf8');
+    const refinementMarkdown = await readFile(join(outputDir, 'TL-1', 'refinement.md'), 'utf8');
+    const agentPrompt = await readFile(join(outputDir, 'TL-1', 'agent-prompt.md'), 'utf8');
+    const copiedSource = await readFile(join(outputDir, 'TL-1', 'sources', 'search-membership-api-contract.md'), 'utf8');
+
+    expect(result.outputDir).toBe(join(outputDir, 'TL-1'));
+    expect(result.evidence.linkedIssues).toHaveLength(1);
+    expect(result.evidence.sources).toHaveLength(1);
+    expect(evidence).toContain('jira://issue/TL-2');
+    expect(evidence).toContain('search-membership-api-contract.md');
+    expect(refinementMarkdown).toContain('Pegá esto en la DESCRIPCIÓN');
+    expect(refinementMarkdown).toContain('Qué ya NO hay que preguntar');
+    expect(agentPrompt).toContain('No conviertas esto en implementación del CLI');
+    expect(agentPrompt).toContain('Cada evidencia nueva elimina preguntas genéricas ya respondidas');
+    expect(copiedSource).toContain('GET /api/members/search');
+  });
 });
 
 async function arrangeCompleteEnv(): Promise<void> {
@@ -217,8 +256,60 @@ function createJiraFetchMock(options: { readonly firstResponseStatus?: number; r
         },
       },
     ] });
+    if (url.pathname === '/rest/api/3/issue/TL-1') return jsonResponse({
+      id: '10001',
+      key: 'TL-1',
+      fields: {
+        summary: 'Integrate Membership Search',
+        description: jiraDoc('Connect FE to BE contract'),
+        status: { name: 'To Do' },
+        assignee: { displayName: 'Hugo Virgen' },
+        issuetype: { name: 'Task' },
+        priority: { name: 'High' },
+        created: '2026-05-01T00:00:00.000+0000',
+        updated: '2026-05-02T00:00:00.000+0000',
+        issuelinks: [{
+          type: { name: 'Polaris work item link' },
+          outwardIssue: {
+            key: 'TL-2',
+            fields: {
+              summary: 'BE Membership Search',
+              status: { name: 'Done' },
+              issuetype: { name: 'Story' },
+            },
+          },
+        }],
+        subtasks: [],
+        comment: { comments: [{ author: { displayName: 'TL' }, created: '2026-05-02T00:00:00.000+0000', body: jiraDoc('Use API contract') }] },
+      },
+    });
+    if (url.pathname === '/rest/api/3/issue/TL-2') return jsonResponse({
+      id: '10002',
+      key: 'TL-2',
+      fields: {
+        summary: 'BE Membership Search',
+        description: jiraDoc('Backend endpoint exists'),
+        status: { name: 'Done' },
+        assignee: { displayName: 'Senku Ishigami' },
+        issuetype: { name: 'Story' },
+        priority: { name: 'High' },
+        created: '2026-05-01T00:00:00.000+0000',
+        updated: '2026-05-02T00:00:00.000+0000',
+        issuelinks: [],
+        subtasks: [],
+        comment: { comments: [] },
+      },
+    });
 
     return jsonResponse({ errorMessages: [`Unexpected mock URL: ${url.pathname}`] }, 404);
+  };
+}
+
+function jiraDoc(text: string): object {
+  return {
+    type: 'doc',
+    version: 1,
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
   };
 }
 

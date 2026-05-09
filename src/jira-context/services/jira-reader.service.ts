@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JiraConfig, InjectConfig } from '#config';
 import { JiraHttpClientService } from '#jira-context/adapters';
-import type { JiraBoardBrief, JiraIssueBrief, JiraSprintBrief } from '#jira-context/domain';
+import type { JiraBoardBrief, JiraIssueBrief, JiraIssueRefinementDetail, JiraLinkedIssueBrief, JiraSprintBrief } from '#jira-context/domain';
 
 @Injectable()
 export class JiraReaderService {
@@ -27,6 +27,13 @@ export class JiraReaderService {
       query: { fields: 'summary,status,assignee,issuetype,priority,parent,updated,issuelinks' },
     });
     return issues.map((issue) => toIssueBrief(issue, [sprintId]));
+  }
+
+  async getIssueRefinementDetail(issueKey: string): Promise<JiraIssueRefinementDetail> {
+    const issue = await this.httpClient.get<JiraIssueDetailResponse>(`/rest/api/3/issue/${encodeURIComponent(issueKey)}`, {
+      query: { fields: 'summary,description,status,assignee,issuetype,priority,parent,updated,created,issuelinks,subtasks,comment' },
+    });
+    return toIssueRefinementDetail(issue);
   }
 }
 
@@ -64,8 +71,48 @@ interface JiraIssueResponse {
 
 interface JiraIssueLinkResponse {
   readonly type?: { readonly name?: string; readonly inward?: string; readonly outward?: string };
-  readonly inwardIssue?: { readonly key?: string };
-  readonly outwardIssue?: { readonly key?: string };
+  readonly inwardIssue?: JiraLinkedIssueResponse;
+  readonly outwardIssue?: JiraLinkedIssueResponse;
+}
+
+interface JiraLinkedIssueResponse {
+  readonly key?: string;
+  readonly fields?: {
+    readonly summary?: string;
+    readonly status?: { readonly name?: string };
+    readonly issuetype?: { readonly name?: string };
+  };
+}
+
+interface JiraIssueDetailResponse {
+  readonly id: string;
+  readonly key: string;
+  readonly fields?: {
+    readonly summary?: string;
+    readonly description?: JiraDocumentNode;
+    readonly status?: { readonly name?: string };
+    readonly assignee?: { readonly displayName?: string } | null;
+    readonly issuetype?: { readonly name?: string };
+    readonly priority?: { readonly name?: string };
+    readonly parent?: JiraLinkedIssueResponse;
+    readonly updated?: string;
+    readonly created?: string;
+    readonly issuelinks?: readonly JiraIssueLinkResponse[];
+    readonly subtasks?: readonly JiraLinkedIssueResponse[];
+    readonly comment?: { readonly comments?: readonly JiraCommentResponse[] };
+  };
+}
+
+interface JiraCommentResponse {
+  readonly author?: { readonly displayName?: string };
+  readonly created?: string;
+  readonly body?: JiraDocumentNode;
+}
+
+interface JiraDocumentNode {
+  readonly type?: string;
+  readonly text?: string;
+  readonly content?: readonly JiraDocumentNode[];
 }
 
 function toBoardBrief(board: JiraBoardResponse): JiraBoardBrief {
@@ -113,6 +160,53 @@ function toIssueBrief(issue: JiraIssueResponse, sprintIds: readonly number[]): J
     ...(fields.updated === undefined ? {} : { updated: fields.updated }),
     dependencyRefs,
   };
+}
+
+function toIssueRefinementDetail(issue: JiraIssueDetailResponse): JiraIssueRefinementDetail {
+  const fields = issue.fields ?? {};
+  const comments = fields.comment?.comments ?? [];
+
+  return {
+    id: issue.id,
+    key: issue.key,
+    ref: `jira://issue/${issue.key}`,
+    summary: fields.summary ?? '(Sin summary)',
+    descriptionText: documentText(fields.description).trim(),
+    ...(fields.status?.name === undefined ? {} : { status: fields.status.name }),
+    ...(fields.assignee?.displayName === undefined ? {} : { assignee: fields.assignee.displayName }),
+    ...(fields.issuetype?.name === undefined ? {} : { issueType: fields.issuetype.name }),
+    ...(fields.priority?.name === undefined ? {} : { priority: fields.priority.name }),
+    ...(fields.parent === undefined ? {} : { parent: toLinkedIssueBrief(fields.parent) }),
+    ...(fields.updated === undefined ? {} : { updated: fields.updated }),
+    ...(fields.created === undefined ? {} : { created: fields.created }),
+    subtasks: (fields.subtasks ?? []).map(toLinkedIssueBrief),
+    linkedIssues: (fields.issuelinks ?? []).flatMap((link) => [link.inwardIssue, link.outwardIssue])
+      .filter((linked): linked is JiraLinkedIssueResponse => linked !== undefined)
+      .map(toLinkedIssueBrief),
+    recentComments: comments.slice(-5).map((comment) => ({
+      ...(comment.author?.displayName === undefined ? {} : { author: comment.author.displayName }),
+      ...(comment.created === undefined ? {} : { created: comment.created }),
+      bodyText: documentText(comment.body).trim(),
+    })),
+  };
+}
+
+function toLinkedIssueBrief(issue: JiraLinkedIssueResponse): JiraLinkedIssueBrief {
+  const key = issue.key ?? 'UNKNOWN';
+  return {
+    key,
+    ref: `jira://issue/${key}`,
+    ...(issue.fields?.summary === undefined ? {} : { summary: issue.fields.summary }),
+    ...(issue.fields?.status?.name === undefined ? {} : { status: issue.fields.status.name }),
+    ...(issue.fields?.issuetype?.name === undefined ? {} : { issueType: issue.fields.issuetype.name }),
+  };
+}
+
+function documentText(node?: JiraDocumentNode): string {
+  if (node === undefined) return '';
+  const ownText = node.text ?? '';
+  const childText = (node.content ?? []).map(documentText).join(' ');
+  return `${ownText}${childText ? ` ${childText}` : ''}`.replace(/\s+/g, ' ');
 }
 
 function isStale(updated?: string): boolean {

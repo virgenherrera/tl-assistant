@@ -3,4 +3,5 @@ export { JiraCapabilityRegistrarService } from './jira-capability-registrar.serv
 export { JiraDependencyMapperService } from './jira-dependency-mapper.service';
 export { JiraDoctorService } from './jira-doctor.service';
 export { JiraReaderService } from './jira-reader.service';
+export { JiraRefinementService } from './jira-refinement.service';
 export { JiraRefreshService } from './jira-refresh.service';

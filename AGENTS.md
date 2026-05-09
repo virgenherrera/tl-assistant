@@ -29,11 +29,22 @@ pnpm dev -- jira:doctor
 pnpm dev -- jira:refresh
 ```
 
+- Generar workspace local descartable de refinamiento para una historia con:
+
+```bash
+pnpm dev -- jira:refine OTPSMT-1422 --source ./contrato-o-nota.md
+```
+
 - Los artifacts locales se generan en `.tl-assistant/jira/` y NO se commitean.
+- Los refinement drafts locales se generan en `.tl-assistant/refinement/{ISSUE_KEY}/` y NO se commitean.
 - Para contexto Jira, leé primero:
   - `.tl-assistant/jira/AGENT_JIRA_CONTEXT.md`
   - `.tl-assistant/jira/tl-brief.md`
   - `.tl-assistant/jira/dependency-map.json`
+- Para refinement de una historia, leé primero:
+  - `.tl-assistant/refinement/{ISSUE_KEY}/agent-prompt.md`
+  - `.tl-assistant/refinement/{ISSUE_KEY}/evidence.json`
+  - `.tl-assistant/refinement/{ISSUE_KEY}/refinement.md`
 - Usar refs `jira://board/{id}`, `jira://sprint/{id}` y `jira://issue/{key}`; no pegar dumps crudos de Jira.
 - Fase actual Jira es read-only: nunca borrar, transicionar ni escribir comentarios desde esta capability.
 

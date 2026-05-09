@@ -2,15 +2,16 @@ import { Module, type DynamicModule, type Provider } from '@nestjs/common';
 import { env } from 'node:process';
 import { ConfigModule } from '#config/config.module';
 import { JiraConfig, loadAppEnvFiles } from '#config';
-import { JiraHttpClientService, LocalJiraContextRepositoryService } from '#jira-context/adapters';
-import { JiraDoctorCommand, JiraRefreshCommand } from '#jira-context/commands';
-import { JIRA_OUTPUT_DIR, jiraFetchProvider, jiraOutputDirProvider } from '#jira-context/providers';
+import { JiraHttpClientService, LocalJiraContextRepositoryService, LocalJiraRefinementRepositoryService } from '#jira-context/adapters';
+import { JiraDoctorCommand, JiraRefineCommand, JiraRefreshCommand } from '#jira-context/commands';
+import { JIRA_OUTPUT_DIR, jiraFetchProvider, jiraOutputDirProvider, jiraRefinementOutputDirProvider } from '#jira-context/providers';
 import {
   JiraBriefService,
   JiraCapabilityRegistrarService,
   JiraDependencyMapperService,
   JiraDoctorService,
   JiraReaderService,
+  JiraRefinementService,
   JiraRefreshService,
 } from '#jira-context/services';
 
@@ -25,14 +26,17 @@ export class JiraContextModule {
     const providers: Provider[] = [
       jiraFetchProvider,
       jiraOutputDirProvider,
+      jiraRefinementOutputDirProvider,
       JiraBriefService,
       JiraCapabilityRegistrarService,
       JiraDependencyMapperService,
       JiraDoctorService,
       JiraHttpClientService,
       JiraReaderService,
+      JiraRefinementService,
       JiraRefreshService,
       LocalJiraContextRepositoryService,
+      LocalJiraRefinementRepositoryService,
     ];
 
     return {
@@ -41,11 +45,13 @@ export class JiraContextModule {
       providers: [
         ...providers,
         JiraDoctorCommand,
+        JiraRefineCommand,
         JiraRefreshCommand,
       ],
       exports: [
         JIRA_OUTPUT_DIR,
         JiraDoctorService,
+        JiraRefinementService,
         JiraRefreshService,
         JiraReaderService,
       ],

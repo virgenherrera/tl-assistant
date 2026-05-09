@@ -83,3 +83,59 @@ export interface JiraRefreshResult {
   readonly brief: JiraTlBrief;
   readonly outputFiles: readonly string[];
 }
+
+export interface JiraIssueRefinementDetail {
+  readonly id: string;
+  readonly key: string;
+  readonly ref: string;
+  readonly summary: string;
+  readonly descriptionText: string;
+  readonly status?: string;
+  readonly assignee?: string;
+  readonly issueType?: string;
+  readonly priority?: string;
+  readonly parent?: JiraLinkedIssueBrief;
+  readonly updated?: string;
+  readonly created?: string;
+  readonly subtasks: readonly JiraLinkedIssueBrief[];
+  readonly linkedIssues: readonly JiraLinkedIssueBrief[];
+  readonly recentComments: readonly JiraIssueCommentBrief[];
+}
+
+export interface JiraLinkedIssueBrief {
+  readonly key: string;
+  readonly ref: string;
+  readonly summary?: string;
+  readonly status?: string;
+  readonly issueType?: string;
+}
+
+export interface JiraIssueCommentBrief {
+  readonly author?: string;
+  readonly created?: string;
+  readonly bodyText: string;
+}
+
+export interface JiraRefinementSourceArtifact {
+  readonly originalPath: string;
+  readonly copiedPath: string;
+  readonly fileName: string;
+  readonly sizeBytes: number;
+  readonly extension: string;
+}
+
+export interface JiraRefinementEvidence {
+  readonly schemaVersion: 'tl-assistant.jira.refinement-evidence.v1';
+  readonly generatedAt: string;
+  readonly issue: JiraIssueRefinementDetail;
+  readonly linkedIssues: readonly JiraIssueRefinementDetail[];
+  readonly sources: readonly JiraRefinementSourceArtifact[];
+}
+
+export interface JiraRefinementResult {
+  readonly generatedAt: string;
+  readonly issueKey: string;
+  readonly outputDir: string;
+  readonly evidence: JiraRefinementEvidence;
+  readonly outputFiles: readonly string[];
+}
