@@ -62,6 +62,12 @@ const contextArtifacts = [
     required: false,
     purpose: 'Brief semántico foundation para decisiones del proyecto.',
   },
+  {
+    id: 'refinement.workspace',
+    path: '.tl-assistant/refinement',
+    required: false,
+    purpose: 'Workspace local descartable para drafts de refinamiento, fuentes y handoff entre agentes.',
+  },
 ] as const satisfies readonly ContextArtifact[];
 
 @Injectable()
@@ -81,6 +87,7 @@ export class TlBootstrapService {
       join(outputDir, 'context-index.json'),
       join(outputDir, 'prompts', 'sprint-status.md'),
       join(outputDir, 'prompts', 'planning-refinement.md'),
+      join(outputDir, 'prompts', 'story-refinement.md'),
       join(outputDir, 'prompts', 'daily-brief.md'),
       join(outputDir, 'prompts', 'risk-review.md'),
     ] as const;
@@ -98,8 +105,9 @@ export class TlBootstrapService {
     await writeFile(outputFiles[1], `${JSON.stringify(result, null, 2)}\n`, 'utf8');
     await writeFile(outputFiles[2], renderSprintStatusPrompt(), 'utf8');
     await writeFile(outputFiles[3], renderPlanningRefinementPrompt(), 'utf8');
-    await writeFile(outputFiles[4], renderDailyBriefPrompt(), 'utf8');
-    await writeFile(outputFiles[5], renderRiskReviewPrompt(), 'utf8');
+    await writeFile(outputFiles[4], renderStoryRefinementPrompt(), 'utf8');
+    await writeFile(outputFiles[5], renderDailyBriefPrompt(), 'utf8');
+    await writeFile(outputFiles[6], renderRiskReviewPrompt(), 'utf8');
 
     return result;
   }
@@ -137,7 +145,15 @@ function renderOperatingContext(result: BootstrapResult): string {
     '4. Si un artifact requerido falta o no puede leerse, decilo explícitamente y NO inventes.',
     '5. NO uses memoria de sesión, historial del repo ni cambios del proyecto `tl-assistant` como sustituto del snapshot Jira.',
     '6. NO hables del proyecto `tl-assistant` salvo que el usuario lo pida explícitamente.',
-    '7. Usá refs `jira://...` y `foundation://local/...`; no pegues dumps crudos.',
+    '7. NO conviertas preguntas sobre sprint, carry-over, planning, refinement, daily o riesgos en propuestas de implementación del CLI. Respondé sobre el trabajo Jira/foundation, no sobre modificar este repo.',
+    '8. Sólo propongas cambios al proyecto `tl-assistant` cuando el usuario pida explícitamente implementar/mejorar el CLI, comandos, prompts o artifacts.',
+    '9. Usá refs `jira://...` y `foundation://local/...`; no pegues dumps crudos.',
+    '',
+    '## Routing de intención',
+    '',
+    '- Si el usuario pregunta por historias, sprint, carry-over, planning, refinement o daily → tratá la consulta como análisis TL sobre los artifacts locales.',
+    '- Si el usuario pide “implementá”, “agregá feature al CLI”, “modificá el repo” o similar → recién ahí hablá de cambios en `tl-assistant`.',
+    '- Si hay ambigüedad entre analizar Jira o cambiar el CLI, preguntá una sola aclaración y frená.',
     '',
     '## Artifacts',
     '',
@@ -147,6 +163,7 @@ function renderOperatingContext(result: BootstrapResult): string {
     '',
     '- `prompts/sprint-status.md` — status ejecutivo del sprint.',
     '- `prompts/planning-refinement.md` — preparación para planning/refinement.',
+    '- `prompts/story-refinement.md` — transformar un issue subdefinido en historia accionable con evidencia.',
     '- `prompts/daily-brief.md` — brief para daily.',
     '- `prompts/risk-review.md` — revisión de riesgos/dependencias.',
     '',
@@ -176,6 +193,93 @@ function renderPlanningRefinementPrompt(): string {
     'Propón preguntas concretas por issue para llevar a planning.',
     'Prioriza por impacto/riesgo usando refs `jira://...`.',
   ]);
+}
+
+function renderStoryRefinementPrompt(): string {
+  return [
+    '# Story refinement',
+    '',
+    '## Objetivo',
+    '',
+    'Transformar un issue Jira subdefinido en una historia accionable usando evidencia disponible. No inventes: juntá señales, reducís incertidumbre y dejás texto claro para Jira/refinement.',
+    '',
+    '## Fuentes a leer primero',
+    '',
+    '1. Leé `.tl-assistant/agent/OPERATING_CONTEXT.md` y `context-index.json`.',
+    '2. Leé `.tl-assistant/jira/issues-map.json`, `.tl-assistant/jira/dependency-map.json`, `.tl-assistant/jira/tl-brief.md` y `.tl-assistant/jira/sprint-map.json`.',
+    '3. Si existe `.tl-assistant/refinement/{ISSUE_KEY}.md`, leelo como draft previo y actualizalo mentalmente; no repitas preguntas ya contestadas.',
+    '4. Si existe `.tl-assistant/refinement/sources/` o `.tl-assistant/refinement/{ISSUE_KEY}/sources/`, leé sólo fuentes relevantes al issue: contracts markdown, OpenAPI/Swagger, snippets, notas o research.',
+    '5. Si foundation está disponible, usala sólo para reglas de producto/arquitectura; si no está, decilo y seguí con Jira + sources locales.',
+    '',
+    '## Regla de evidencia',
+    '',
+    '- Separá siempre **hechos**, **inferencias** y **preguntas abiertas**.',
+    '- Cada nueva evidencia debe eliminar preguntas genéricas ya respondidas.',
+    '- Si un contract/OpenAPI/Swagger ya define endpoint, request, response o errores, NO preguntes eso de nuevo.',
+    '- Convertí lo confirmado en texto listo para Jira.',
+    '- Conservá sólo preguntas dirigidas sobre lo que sigue ambiguo.',
+    '- No pegues dumps crudos de Jira ni documentos completos; resumí y citá refs/rutas locales.',
+    '',
+    '## Formato obligatorio de salida',
+    '',
+    'Respondé en español para guiar al TL, pero los bloques que se pegan en Jira deben ir en inglés cuando el proyecto lo requiera.',
+    '',
+    'Usá estas secciones exactas:',
+    '',
+    '````md',
+    '# {ISSUE_KEY} — Qué pegar y dónde',
+    '',
+    '## 0. Resumen para vos',
+    '',
+    '## 1. Fuentes usadas',
+    '',
+    '| Fuente | Estado | Qué aportó |',
+    '|---|---|---|',
+    '',
+    '## 2. Qué sabemos',
+    '',
+    '## 3. Qué ya NO hay que preguntar',
+    '',
+    '## 4. Qué sigue abierto',
+    '',
+    '## 5. Pegá esto en la DESCRIPCIÓN del ticket',
+    '',
+    '```txt',
+    '{English Jira-ready description}',
+    '```',
+    '',
+    '## 6. Pegá esto como ACCEPTANCE CRITERIA',
+    '',
+    '```txt',
+    '{English Jira-ready acceptance criteria}',
+    '```',
+    '',
+    '## 7. Subtareas sugeridas',
+    '',
+    '```txt',
+    '{English subtask titles/descriptions if needed}',
+    '```',
+    '',
+    '## 8. Preguntas para refinement',
+    '',
+    '```txt',
+    '{Targeted remaining questions only}',
+    '```',
+    '',
+    '## 9. Puntos sugeridos para vos',
+    '',
+    '## 10. Cómo decirlo en refinement',
+    '',
+    '## 11. Orden recomendado',
+    '````',
+    '',
+    '## Criterio de calidad',
+    '',
+    '- El output debe decir explícitamente qué va dónde: descripción, AC, subtarea, technical notes o conversación de refinement.',
+    '- No abras con “this task has no description” dentro del texto para Jira si estás redactando la descripción.',
+    '- No generes enciclopedias: generá handoff accionable.',
+    '- Si encontrás una fuente nueva, actualizá el análisis: lo confirmado deja de ser pregunta.',
+  ].join('\n').trimEnd() + '\n';
 }
 
 function renderDailyBriefPrompt(): string {

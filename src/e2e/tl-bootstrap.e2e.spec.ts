@@ -30,17 +30,27 @@ describe('TL bootstrap e2e integration', () => {
       const outputFileNames = result.outputFiles.map((file) => basename(file));
       const operatingContext = await readFile(join(outputDir, 'OPERATING_CONTEXT.md'), 'utf8');
       const planningPrompt = await readFile(join(outputDir, 'prompts', 'planning-refinement.md'), 'utf8');
+      const storyRefinementPrompt = await readFile(join(outputDir, 'prompts', 'story-refinement.md'), 'utf8');
       const contextIndex = await readFile(join(outputDir, 'context-index.json'), 'utf8');
 
-      expect(outputFileNames).toEqual(expect.arrayContaining(['OPERATING_CONTEXT.md', 'context-index.json']));
+      expect(outputFileNames).toEqual(expect.arrayContaining(['OPERATING_CONTEXT.md', 'context-index.json', 'story-refinement.md']));
       expect(result.missingRequiredArtifacts).toEqual([]);
       expect(operatingContext).toContain('NO uses memoria de sesión');
       expect(operatingContext).toContain('.tl-assistant/jira/issues-map.json');
       expect(operatingContext).toContain('NO hables del proyecto `tl-assistant`');
+      expect(operatingContext).toContain('NO conviertas preguntas sobre sprint');
+      expect(operatingContext).toContain('Routing de intención');
+      expect(operatingContext).toContain('carry-over');
       expect(operatingContext).toContain('prompts/planning-refinement.md');
+      expect(operatingContext).toContain('prompts/story-refinement.md');
       expect(planningPrompt).toContain('Detecta issues que no están listos para planning/refinement');
       expect(planningPrompt).toContain('jira://');
+      expect(storyRefinementPrompt).toContain('Transformar un issue Jira subdefinido');
+      expect(storyRefinementPrompt).toContain('Qué ya NO hay que preguntar');
+      expect(storyRefinementPrompt).toContain('Pegá esto en la DESCRIPCIÓN');
+      expect(storyRefinementPrompt).toContain('Cada nueva evidencia debe eliminar preguntas genéricas ya respondidas');
       expect(contextIndex).toContain('.tl-assistant/jira/tl-brief.md');
+      expect(contextIndex).toContain('.tl-assistant/refinement');
     } finally {
       process.chdir(cwd);
     }

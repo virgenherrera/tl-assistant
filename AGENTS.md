@@ -54,6 +54,7 @@ Lee .tl-assistant/agent/OPERATING_CONTEXT.md y ejecuta el prompt operativo que c
 - Prompts disponibles:
   - `.tl-assistant/agent/prompts/sprint-status.md`
   - `.tl-assistant/agent/prompts/planning-refinement.md`
+  - `.tl-assistant/agent/prompts/story-refinement.md`
   - `.tl-assistant/agent/prompts/daily-brief.md`
   - `.tl-assistant/agent/prompts/risk-review.md`
 
