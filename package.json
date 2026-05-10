@@ -63,6 +63,8 @@
     "#jira-context": "./src/jira-context/index.ts",
     "#jira-context/*": "./src/jira-context/*",
     "#tl-bootstrap": "./src/tl-bootstrap/index.ts",
-    "#tl-bootstrap/*": "./src/tl-bootstrap/*"
+    "#tl-bootstrap/*": "./src/tl-bootstrap/*",
+    "#agent-handoff": "./src/agent-handoff/index.ts",
+    "#agent-handoff/*": "./src/agent-handoff/*"
   }
 }
