@@ -31,9 +31,15 @@ describe('TL bootstrap e2e integration', () => {
       const operatingContext = await readFile(join(outputDir, 'OPERATING_CONTEXT.md'), 'utf8');
       const planningPrompt = await readFile(join(outputDir, 'prompts', 'planning-refinement.md'), 'utf8');
       const storyRefinementPrompt = await readFile(join(outputDir, 'prompts', 'story-refinement.md'), 'utf8');
+      const jiraIssueDiscussionPrompt = await readFile(join(outputDir, 'prompts', 'jira-issue-discussion.md'), 'utf8');
       const contextIndex = await readFile(join(outputDir, 'context-index.json'), 'utf8');
 
-      expect(outputFileNames).toEqual(expect.arrayContaining(['OPERATING_CONTEXT.md', 'context-index.json', 'story-refinement.md']));
+      expect(outputFileNames).toEqual(expect.arrayContaining([
+        'OPERATING_CONTEXT.md',
+        'context-index.json',
+        'story-refinement.md',
+        'jira-issue-discussion.md',
+      ]));
       expect(result.missingRequiredArtifacts).toEqual([]);
       expect(operatingContext).toContain('NO uses memoria de sesión');
       expect(operatingContext).toContain('.tl-assistant/jira/issues-map.json');
@@ -41,6 +47,8 @@ describe('TL bootstrap e2e integration', () => {
       expect(operatingContext).toContain('NO conviertas preguntas sobre sprint');
       expect(operatingContext).toContain('Routing de intención');
       expect(operatingContext).toContain('carry-over');
+      expect(operatingContext).toContain('modo análisis/documentación');
+      expect(operatingContext).toContain('prompts/jira-issue-discussion.md');
       expect(operatingContext).toContain('prompts/planning-refinement.md');
       expect(operatingContext).toContain('prompts/story-refinement.md');
       expect(planningPrompt).toContain('Detecta issues que no están listos para planning/refinement');
@@ -51,6 +59,10 @@ describe('TL bootstrap e2e integration', () => {
       expect(storyRefinementPrompt).toContain('Qué ya NO hay que preguntar');
       expect(storyRefinementPrompt).toContain('Pegá esto en la DESCRIPCIÓN');
       expect(storyRefinementPrompt).toContain('Cada nueva evidencia debe eliminar preguntas genéricas ya respondidas');
+      expect(jiraIssueDiscussionPrompt).toContain('Analizar una lista puntual de issues Jira');
+      expect(jiraIssueDiscussionPrompt).toContain('No escribas ni modifiques código fuente');
+      expect(jiraIssueDiscussionPrompt).toContain('Mermaid');
+      expect(jiraIssueDiscussionPrompt).toContain('hechos**, **inferencias**, **riesgos**');
       expect(contextIndex).toContain('.tl-assistant/jira/tl-brief.md');
       expect(contextIndex).toContain('.tl-assistant/refinement');
     } finally {
