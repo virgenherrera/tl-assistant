@@ -71,6 +71,12 @@
       ],
       "#tl-bootstrap/*": [
         "./src/tl-bootstrap/*"
+      ],
+      "#agent-handoff": [
+        "./src/agent-handoff/index.ts"
+      ],
+      "#agent-handoff/*": [
+        "./src/agent-handoff/*"
       ]
     }
   },

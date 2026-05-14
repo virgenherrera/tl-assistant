@@ -48,6 +48,24 @@ pnpm dev -- jira:refine OTPSMT-1422 --source ./contrato-o-nota.md
 - Usar refs `jira://board/{id}`, `jira://sprint/{id}` y `jira://issue/{key}`; no pegar dumps crudos de Jira.
 - Fase actual Jira es read-only: nunca borrar, transicionar ni escribir comentarios desde esta capability.
 
+## Sandbox auditable para agentes externos
+
+- Preparar un workspace descartable con:
+
+```bash
+pnpm dev -- agent:handoff RUN_ID --repo /ruta/local/repo --allow "src/**" --max-files 8 --max-lines 400
+```
+
+- Abrir `.tl-assistant/agent-runs/{RUN_ID}/sandbox` en VS Code/Frida y seguir `.agent-handoff/TASK.md`.
+- Después del agente, auditar con:
+
+```bash
+pnpm dev -- agent:audit .tl-assistant/agent-runs/RUN_ID
+```
+
+- Nunca aceptar output de agente sin revisar `AUDIT_REPORT.md`.
+- Estos comandos no ejecutan build.
+
 ## Bootstrap operativo para agentes
 
 - Después de correr `jira:refresh` y/o `foundation:refresh`, generar el runbook operativo con:
