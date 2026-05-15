@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { parseReadableLocalPath } from '#config/path/local-paths';
+import { toAbsoluteLocalPath } from '#config/path/local-paths';
 
 export class FoundationDocsConfig {
   readonly configured!: boolean;
@@ -20,7 +20,7 @@ export class FoundationDocsConfig {
 
       return {
         configured: true,
-        discoveryRootPath: parseReadableLocalPath(FOUNDATION_DOCS_PATH, 'FOUNDATION_DOCS_PATH'),
+        discoveryRootPath: toAbsoluteLocalPath(FOUNDATION_DOCS_PATH),
       } satisfies FoundationDocsConfig;
     });
 }

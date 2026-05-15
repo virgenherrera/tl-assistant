@@ -77,6 +77,12 @@
       ],
       "#agent-handoff/*": [
         "./src/agent-handoff/*"
+      ],
+      "#confluence-context": [
+        "./src/confluence-context/index.ts"
+      ],
+      "#confluence-context/*": [
+        "./src/confluence-context/*"
       ]
     }
   },

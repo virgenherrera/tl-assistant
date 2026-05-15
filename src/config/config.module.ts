@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppConfigModule } from './app-config.module';
-import { FoundationOutputConfig, FoundationDocsConfig, JiraConfig } from './configurations';
+import { FoundationOutputConfig, FoundationDocsConfig, JiraConfig, ConfluenceConfig } from './configurations';
 import { loadAppEnvFiles } from './env/app-env';
 
 loadAppEnvFiles();
@@ -9,7 +9,7 @@ loadAppEnvFiles();
   imports: [
     AppConfigModule.forRoot({
       cache: false,
-      configClasses: [FoundationDocsConfig, FoundationOutputConfig, JiraConfig],
+      configClasses: [FoundationDocsConfig, FoundationOutputConfig, JiraConfig, ConfluenceConfig],
       expandVariables: true,
       isGlobal: true,
     }),

@@ -65,6 +65,8 @@
     "#tl-bootstrap": "./src/tl-bootstrap/index.ts",
     "#tl-bootstrap/*": "./src/tl-bootstrap/*",
     "#agent-handoff": "./src/agent-handoff/index.ts",
-    "#agent-handoff/*": "./src/agent-handoff/*"
+    "#agent-handoff/*": "./src/agent-handoff/*",
+    "#confluence-context": "./src/confluence-context/index.ts",
+    "#confluence-context/*": "./src/confluence-context/*"
   }
 }
